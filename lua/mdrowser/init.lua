@@ -73,7 +73,7 @@ local function run_command(url)
 
 	local escaped_url = vim.fn.shellescape(cleaned)
 	local escaped_domain = vim.fn.shellescape(domain)
-	local cmd = string.format("curl --no-progress-meter %s | html2markdown --domain=%s", escaped_url, escaped_domain)
+	local cmd = string.format("curl --no-progress-meter %s -L | html2markdown --domain=%s", escaped_url, escaped_domain)
 
 	local stdout, stderr = {}, {}
 	local job = vim.fn.jobstart({ "bash", "-lc", cmd }, {
