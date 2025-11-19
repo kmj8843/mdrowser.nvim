@@ -129,6 +129,22 @@ local function prompt_for_url()
 	end)
 end
 
+local function extract_url_from_link_target(target)
+	target = trim(target)
+	if target == "" then
+		return nil
+	end
+
+	if target:sub(1, 1) == "<" then
+		local closing = target:find(">", 2, true)
+		if closing then
+			return target:sub(2, closing - 1)
+		end
+	end
+
+	return target:match("^%S+")
+end
+
 local function find_link_under_cursor()
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local col = cursor[2] + 1 -- Lua index is 1-based
@@ -136,12 +152,12 @@ local function find_link_under_cursor()
 	local init = 1
 
 	while true do
-		local start_idx, end_idx, _, url = line:find("%[([^%]]+)%]%(([^)]+)%)", init)
+		local start_idx, end_idx, _, target = line:find("%[([^%]]+)%]%(([^)]+)%)", init)
 		if not start_idx then
 			return nil
 		end
 		if col >= start_idx and col <= end_idx then
-			return url
+			return extract_url_from_link_target(target)
 		end
 		init = end_idx + 1
 	end
